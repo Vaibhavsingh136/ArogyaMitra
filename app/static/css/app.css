@@ -1,0 +1,168 @@
+/* ArogyaMitra Custom Brand & Kiosk Stylesheet
+   Source of truth: brandguideline.md & systemdesign.md */
+
+:root {
+  --brand-primary: #7CA68D;       /* Arogya Green */
+  --brand-primary-dark: #638d74;
+  --brand-primary-light: #98bea8;
+  --brand-secondary: #C0C3B9;     /* Soft Sage Gray */
+  --brand-bg: #F3EFE3;            /* Calm Neutral Background */
+  --brand-text-dark: #1E293B;     /* Charcoal */
+  --brand-card-bg: #FFFFFF;
+  --status-draft: #D97706;        /* Amber */
+  --status-verified: #059669;     /* Emerald */
+  --status-alert: #DC2626;        /* Coral Red */
+}
+
+body {
+  background-color: var(--brand-bg);
+  color: var(--brand-text-dark);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #E8E5D8;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--brand-secondary);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-primary);
+}
+
+/* Brand Button Classes */
+.btn-primary {
+  background-color: var(--brand-primary);
+  color: #FFFFFF;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(124, 166, 141, 0.25);
+  min-height: 48px;
+}
+.btn-primary:hover {
+  background-color: var(--brand-primary-dark);
+  box-shadow: 0 4px 8px rgba(124, 166, 141, 0.35);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: #FFFFFF;
+  color: var(--brand-text-dark);
+  border: 1.5px solid var(--brand-secondary);
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease-in-out;
+  min-height: 48px;
+}
+.btn-secondary:hover {
+  background-color: #F8FAF7;
+  border-color: var(--brand-primary);
+  color: var(--brand-primary-dark);
+}
+
+/* Kiosk Mode Styles */
+.kiosk-mode .kiosk-touch-target {
+  min-height: 56px;
+  font-size: 1.125rem;
+}
+.kiosk-mode .kiosk-text-large {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+.kiosk-mode header {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Audio Waveform Animation */
+.waveform-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 40px;
+}
+.waveform-bar {
+  width: 4px;
+  background-color: var(--brand-primary);
+  border-radius: 2px;
+  animation: wavePulse 1.2s infinite ease-in-out;
+}
+.waveform-bar:nth-child(1) { animation-delay: 0.0s; height: 12px; }
+.waveform-bar:nth-child(2) { animation-delay: 0.1s; height: 24px; }
+.waveform-bar:nth-child(3) { animation-delay: 0.2s; height: 36px; }
+.waveform-bar:nth-child(4) { animation-delay: 0.3s; height: 28px; }
+.waveform-bar:nth-child(5) { animation-delay: 0.4s; height: 16px; }
+.waveform-bar:nth-child(6) { animation-delay: 0.5s; height: 32px; }
+.waveform-bar:nth-child(7) { animation-delay: 0.6s; height: 20px; }
+
+@keyframes wavePulse {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.6; }
+  50% { transform: scaleY(1.2); opacity: 1; }
+}
+
+/* Pulse animation for active voice recording */
+@keyframes micGlow {
+  0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6); }
+  70% { box-shadow: 0 0 0 16px rgba(220, 38, 38, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+.mic-recording {
+  animation: micGlow 1.5s infinite;
+  background-color: #DC2626 !important;
+  color: white !important;
+}
+
+/* Badge Classes */
+.badge-draft {
+  background-color: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FCD34D;
+}
+.badge-verified {
+  background-color: #D1FAE5;
+  color: #065F46;
+  border: 1px solid #6EE7B7;
+}
+.badge-alert {
+  background-color: #FEE2E2;
+  color: #991B1B;
+  border: 1px solid #FCA5A5;
+}
+
+/* Scanning document overlay effect */
+.scanning-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--brand-primary), transparent);
+  box-shadow: 0 0 8px var(--brand-primary);
+  animation: scanLine 2s infinite ease-in-out;
+}
+@keyframes scanLine {
+  0% { top: 0%; opacity: 0.8; }
+  50% { top: 100%; opacity: 1; }
+  100% { top: 0%; opacity: 0.8; }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "image": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Chest_Xray_PA_3-8-2010.png",
+    "system_prompt": "You are an expert radiologist.",
+    "user_query": "Describe this Chest X-ray and report significant findings.",
+    "assistant_response": "FINDINGS: Cardiomegaly is noted with prominent left ventricular contour. Bilateral bronchovascular markings are accentuated. Costophrenic sulci and dome of diaphragm appear normal. Bony thorax intact.\nIMPRESSION: Cardiomegaly with mild pulmonary venous congestion. Findings suspicious for left ventricular enlargement."
+  },
+  {
+    "image": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Chest_Xray_PA_3-8-2010.png",
+    "system_prompt": "You are an expert radiologist.",
+    "user_query": "Is there any evidence of acute consolidation or pleural effusion?",
+    "assistant_response": "FINDINGS: Lung parenchyma demonstrates no focal air-space consolidation, ground-glass opacity, or large pleural effusion. Mediastinal contours are stable.\nIMPRESSION: No acute pneumonia or pleural effusion."
+  }
+]

@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ArogyaMitra — AI Pre-Consultation Clinical Intake Platform</title>
+  
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Custom Brand Styles (#7CA68D, #C0C3B9, #F3EFE3) -->
+  <link rel="stylesheet" href="/static/css/app.css" />
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#7CA68D] selection:text-white bg-[#F8FAFC]">
+
+  <!-- TOP APP HEADER (Clean, Accessible & Role-Aware) -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="if(!App.currentUser){App.showLandingScreen();} else {App.enterRoleView(App.currentUser.role);}">
+        <div class="w-10 h-10 rounded-xl bg-[#7CA68D] text-white flex items-center justify-center shadow-sm">
+          <i data-lucide="heart-pulse" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-xl tracking-tight text-slate-900">Arogya<span class="text-[#7CA68D]">Mitra</span></span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#7CA68D]/15 text-[#638d74] border border-[#7CA68D]/30">CLINICAL PLATFORM</span>
+          </div>
+          <p class="text-[11px] text-slate-500 hidden sm:block">Pre-Consultation Clinical Intake & Digitization</p>
+        </div>
+      </div>
+
+      <!-- Center / User State Info -->
+      <div id="header-user-badge" class="flex items-center">
+        <!-- Rendered by auth.js -->
+      </div>
+
+      <!-- Right Actions: Priority Alert Feature, Kiosk Toggle -->
+      <div class="flex items-center gap-2.5">
+        <!-- Priority Alert Feature Button -->
+        <button onclick="DoctorDashboard.showRedFlagModal()" 
+                class="px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold flex items-center gap-1.5 transition shadow-sm" 
+                title="Priority Alert Detection">
+          <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-red-600"></i>
+          <span class="hidden sm:inline">Priority Alert</span>
+        </button>
+
+        <!-- Kiosk Mode Toggle -->
+        <button id="kiosk-toggle-btn" onclick="App.toggleKioskMode()" 
+                class="p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium flex items-center gap-1.5 transition" 
+                title="Toggle Hospital Kiosk Touch Mode">
+          <i data-lucide="tablet" class="w-4 h-4 text-slate-600"></i>
+          <span class="hidden lg:inline">Kiosk Mode</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- ============================================================ -->
+    <!-- VIEW 0: PRE-ENTRY LANDING SCREEN ("Who are you?")            -->
+    <!-- ============================================================ -->
+    <div id="view-landing-role-select" class="space-y-8 animate-fadeIn py-6 max-w-5xl mx-auto">
+      <div class="text-center max-w-2xl mx-auto space-y-3">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#7CA68D]/15 text-[#638d74] text-xs font-bold">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+          <span>ArogyaMitra OPD Clinical Intake System</span>
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
+          Welcome to ArogyaMitra
+        </h1>
+        <p class="text-slate-600 text-base sm:text-lg">
+          Better History. Better Preparation. Better Conversations.
+        </p>
+        <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider pt-2">
+          Please select your role to proceed:
+        </p>
+      </div>
+
+      <!-- 4 Role Selection Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 pt-2">
+        
+        <!-- Role 1: Patient -->
+        <div onclick="App.selectRole('PATIENT')" 
+             class="group cursor-pointer bg-white p-6 rounded-2xl border-2 border-slate-200 hover:border-[#7CA68D] hover:shadow-xl transition-all flex flex-col justify-between text-left">
+          <div>
+            <div class="w-14 h-14 rounded-2xl bg-[#7CA68D]/15 text-[#638d74] flex items-center justify-center mb-4 group-hover:scale-105 transition">
+              <i data-lucide="user" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 group-hover:text-[#7CA68D] transition mb-1">Patient</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Register or log in to record your medical history in your native language and scan previous prescriptions.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#7CA68D]">
+            <span>Patient Portal</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+          </div>
+        </div>
+
+        <!-- Role 2: Doctor -->
+        <div onclick="App.selectRole('DOCTOR')" 
+             class="group cursor-pointer bg-white p-6 rounded-2xl border-2 border-slate-200 hover:border-blue-500 hover:shadow-xl transition-all flex flex-col justify-between text-left">
+          <div>
+            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4 group-hover:scale-105 transition">
+              <i data-lucide="stethoscope" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition mb-1">Doctor</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Review pre-consultation patient dossiers, digitized prescriptions, lab alerts, and digitally verify AI summaries.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600">
+            <span>Doctor Login</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+          </div>
+        </div>
+
+        <!-- Role 3: Radiologist -->
+        <div onclick="App.selectRole('RADIOLOGIST')" 
+             class="group cursor-pointer bg-white p-6 rounded-2xl border-2 border-slate-200 hover:border-purple-500 hover:shadow-xl transition-all flex flex-col justify-between text-left">
+          <div>
+            <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4 group-hover:scale-105 transition">
+              <i data-lucide="scan" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 group-hover:text-purple-600 transition mb-1">Radiologist</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Access patient imaging studies (X-Ray, CT, MRI, USG), enter diagnostic findings, and flag critical alerts.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-purple-600">
+            <span>Radiologist Login</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+          </div>
+        </div>
+
+        <!-- Role 4: Admin -->
+        <div onclick="App.selectRole('ADMIN')" 
+             class="group cursor-pointer bg-white p-6 rounded-2xl border-2 border-slate-200 hover:border-emerald-600 hover:shadow-xl transition-all flex flex-col justify-between text-left">
+          <div>
+            <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 group-hover:scale-105 transition">
+              <i data-lucide="shield-check" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 group-hover:text-emerald-600 transition mb-1">Administrator</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Generate and deactivate staff credentials, manage system settings, and inspect security audit trails.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600">
+            <span>Admin Login</span>
+            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition"></i>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="text-center pt-6 text-xs text-slate-400">
+        <i data-lucide="lock" class="w-4 h-4 inline-block mr-1"></i> Role-based access control (RBAC) and database separation are strictly enforced by the backend.
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- VIEW 1: PATIENT KIOSK / PRE-CONSULTATION INTAKE JOURNEY      -->
+    <!-- ============================================================ -->
+    <div id="view-patient-kiosk" class="hidden space-y-6 animate-fadeIn">
+      
+      <!-- Kiosk Stepper Navigation -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+        <div class="flex items-center justify-between text-xs sm:text-sm font-semibold overflow-x-auto gap-3 py-1">
+          <div class="kiosk-step-pill flex items-center gap-2 cursor-pointer" onclick="App.goToStep(1)">
+            <span class="step-num w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs">1</span>
+            <span>Language</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 flex-shrink-0"></i>
+          
+          <div class="kiosk-step-pill flex items-center gap-2 opacity-50 cursor-pointer" onclick="App.goToStep(2)">
+            <span class="step-num w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs">2</span>
+            <span>Identification</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 flex-shrink-0"></i>
+
+          <div class="kiosk-step-pill flex items-center gap-2 opacity-50 cursor-pointer" onclick="App.goToStep(3)">
+            <span class="step-num w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs">3</span>
+            <span>Consent</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 flex-shrink-0"></i>
+
+          <div class="kiosk-step-pill flex items-center gap-2 opacity-50 cursor-pointer" onclick="App.goToStep(4)">
+            <span class="step-num w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs">4</span>
+            <span>Health History</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 flex-shrink-0"></i>
+
+          <div class="kiosk-step-pill flex items-center gap-2 opacity-50 cursor-pointer" onclick="App.goToStep(5)">
+            <span class="step-num w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs">5</span>
+            <span>Documents (Optional)</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 flex-shrink-0"></i>
+
+          <div class="kiosk-step-pill flex items-center gap-2 opacity-50 cursor-pointer" onclick="App.goToStep(6)">
+            <span class="step-num w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs">6</span>
+            <span>Summary</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 1: WELCOME & MULTILINGUAL LANGUAGE SELECTION -->
+      <section id="kiosk-step-1" class="space-y-6">
+        <div class="text-center max-w-2xl mx-auto py-6">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#7CA68D]/15 text-[#638d74] text-xs font-bold mb-4">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>Namaste! Welcome to ArogyaMitra</span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
+            Choose Your Preferred Language
+          </h1>
+          <p class="text-slate-600 text-base sm:text-lg">
+            Speak or read in the language you are most comfortable with. We will prepare your health record for your doctor.
+          </p>
+        </div>
+
+        <div id="language-selection-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="text-center pt-4">
+          <p class="text-xs text-slate-500">
+            <i data-lucide="mic" class="w-4 h-4 inline-block mr-1"></i> You can speak naturally in your chosen language during the health history interview.
+          </p>
+        </div>
+      </section>
+
+      <!-- STEP 2: PATIENT IDENTIFICATION & MOCK ABDM / ABHA LINKING -->
+      <section id="kiosk-step-2" class="hidden max-w-2xl mx-auto space-y-6">
+        <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold mb-2">
+              <i data-lucide="shield" class="w-3.5 h-3.5"></i>
+              <span>Mock ABDM / ABHA Gateway</span>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900">Patient Identification</h2>
+            <p class="text-slate-500 text-sm">Enter your 14-digit ABHA ID or phone number to quickly link your health history.</p>
+          </div>
+
+          <!-- ABHA ID Input with 1-click verify -->
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Ayushman Bharat Health Account (ABHA ID):</label>
+            <div class="flex gap-2">
+              <input type="text" id="reg-abha-input" 
+                placeholder="e.g. 91-4820-9182-3841@abdm" 
+                     class="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-sm font-mono focus:border-[#7CA68D] outline-none" />
+              <button onclick="App.verifyABHA()" class="btn-secondary py-2.5 px-4 text-xs font-semibold rounded-xl">
+                <i data-lucide="search" class="w-4 h-4"></i>
+                <span>Fetch ABHA</span>
+              </button>
+            </div>
+            <div class="text-[11px] text-slate-500">
+              Please enter your ABHA ID or phone number to link your record.
+            </div>
+          </div>
+
+          <!-- Demographic Form -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name *</label>
+              <input type="text" id="reg-name-input" 
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:border-[#7CA68D] outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number *</label>
+              <input type="text" id="reg-phone-input" 
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:border-[#7CA68D] outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Date of Birth</label>
+              <input type="date" id="reg-dob-input" 
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:border-[#7CA68D] outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Gender</label>
+              <select id="reg-gender-select" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:border-[#7CA68D] outline-none bg-white">
+                <option value="Male" selected>Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="pt-4 flex items-center justify-between border-t border-slate-100">
+            <button onclick="App.goToStep(1)" class="btn-secondary py-3 px-5 text-sm font-semibold rounded-xl">Back</button>
+            <button onclick="App.submitRegistration()" class="btn-primary py-3 px-6 text-sm font-semibold rounded-xl">
+              <span>Continue to Consent</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 3: GRANULAR PATIENT CONSENT -->
+      <section id="kiosk-step-3" class="hidden max-w-2xl mx-auto space-y-6">
+        <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-bold mb-2">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                <span>Privacy & Explicit Consent</span>
+              </div>
+              <h2 class="text-2xl font-bold text-slate-900">Your Privacy & Consent</h2>
+            </div>
+            <button onclick="VoiceEngine.speak('We respect your privacy. ArogyaMitra only collects medical information to prepare a summary for your doctor. You have full control, and your information is never shared without your permission.', App.currentLanguage)" 
+                    class="p-2.5 rounded-xl border border-slate-200 hover:bg-[#F3EFE3] text-slate-700 flex items-center gap-1.5 text-xs font-semibold transition" title="Listen to Consent">
+              <i data-lucide="volume-2" class="w-4 h-4 text-[#7CA68D]"></i>
+              <span>Listen in Audio</span>
+            </button>
+          </div>
+
+          <div class="p-5 rounded-xl bg-[#F3EFE3]/60 border border-[#C0C3B9]/60 text-sm text-slate-700 space-y-3">
+            <p><b>Why we collect this information:</b></p>
+            <ul class="list-disc pl-5 space-y-1.5 text-xs leading-relaxed text-slate-600">
+              <li>To help you record your symptoms and past medical history accurately in your own language.</li>
+              <li>To convert uploaded medical documents into a structured chronological timeline.</li>
+              <li>To generate a draft clinical summary exclusively for your attending OPD physician's review.</li>
+            </ul>
+            <p class="text-xs text-slate-500 pt-2 border-t border-[#C0C3B9]/40">
+              <i data-lucide="lock" class="w-4 h-4 inline-block mr-1"></i> <b>Security Guarantee:</b> Temporary voice session audio is automatically cleared after processing. Your medical records are encrypted at rest.
+            </p>
+          </div>
+
+          <div class="space-y-3">
+            <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="checkbox" id="consent-check-1" checked class="w-5 h-5 rounded text-[#7CA68D] focus:ring-[#7CA68D] mt-0.5" />
+              <div class="text-xs text-slate-800">
+                <b>I consent to AI-guided health history intake</b> for my pre-consultation OPD preparation.
+              </div>
+            </label>
+            <label class="flex items-start gap-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+              <input type="checkbox" id="consent-check-2" checked class="w-5 h-5 rounded text-[#7CA68D] focus:ring-[#7CA68D] mt-0.5" />
+              <div class="text-xs text-slate-800">
+                <b>I understand that ArogyaMitra assists clinical workflow</b> and does not autonomously diagnose medical conditions.
+              </div>
+            </label>
+          </div>
+
+          <div class="pt-4 flex items-center justify-between border-t border-slate-100">
+            <button onclick="App.goToStep(1)" class="btn-secondary py-3 px-5 text-sm font-semibold rounded-xl">Back</button>
+            <button onclick="App.grantConsent(true)" class="btn-primary py-3.5 px-6 text-sm font-semibold rounded-xl">
+              <i data-lucide="check" class="w-4 h-4"></i>
+              <span>I Agree & Give Consent</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 4: AI CONVERSATIONAL HEALTH HISTORY INTERVIEW -->
+      <section id="kiosk-step-4" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Left 2 Cols: Active Adaptive Question & Input -->
+          <div class="lg:col-span-2 space-y-4">
+            <div id="intake-question-container">
+              <!-- Rendered dynamically by intake.js -->
+            </div>
+          </div>
+
+          <!-- Right 1 Col: Live Structured History Preview Panel -->
+          <div class="space-y-4">
+            <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="activity" class="w-4 h-4 text-[#7CA68D]"></i>
+                  <h4 class="font-bold text-slate-900 text-sm">Structured Intake Record</h4>
+                </div>
+                <span class="px-2 py-0.5 bg-slate-100 rounded text-[10px] font-bold text-slate-600">LIVE SYNC</span>
+              </div>
+              
+              <div id="live-history-list" class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+                <div class="text-xs text-slate-400 py-6 text-center">
+                  Your spoken or selected answers will be organized into standardized medical categories in real time.
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- STEP 5: PREVIOUS MEDICAL DOCUMENTS UPLOAD (SKIPPABLE) -->
+      <section id="kiosk-step-5" class="hidden space-y-6">
+        <div class="max-w-4xl mx-auto space-y-6">
+          <div class="text-center max-w-xl mx-auto">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#7CA68D]/15 text-[#638d74] text-xs font-bold mb-2">
+              <i data-lucide="scan" class="w-3.5 h-3.5"></i>
+              <span>Medical Documents (Optional)</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">
+              Do you have previous medical reports or prescriptions?
+            </h2>
+            <p class="text-slate-600 text-sm mt-1">
+              Uploading previous records is optional. If you don't have documents with you today, you can simply skip this step.
+            </p>
+          </div>
+
+          <!-- Prominent Action Buttons: Upload or Skip for Now -->
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4 py-2">
+            <button onclick="document.getElementById('custom-doc-upload').click()" class="btn-primary w-full sm:w-auto px-8 py-3.5 text-base font-bold rounded-xl flex items-center justify-center gap-2 shadow-sm">
+              <i data-lucide="upload" class="w-5 h-5"></i>
+              <span>Upload Document</span>
+            </button>
+            <button onclick="App.skipDocumentUpload()" class="btn-secondary w-full sm:w-auto px-8 py-3.5 text-base font-bold rounded-xl flex items-center justify-center gap-2">
+              <i data-lucide="skip-forward" class="w-5 h-5 text-slate-500"></i>
+              <span>Skip for Now</span>
+            </button>
+          </div>
+
+          <!-- Removed preset sample documents for patient-facing UI -->
+
+          <!-- Hidden File Upload Input -->
+          <input type="file" id="custom-doc-upload" class="hidden" accept="image/*,application/pdf" 
+                 onchange="OCRViewer.uploadCustomFile(this.files[0])" />
+
+          <!-- Uploaded Documents List -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-slate-900 text-sm">Attached Medical Documents</h4>
+              <span class="text-xs text-slate-500">Click any document to inspect OCR extractions</span>
+            </div>
+            <div id="uploaded-docs-list" class="space-y-2.5">
+              <!-- Populated by ocr_viewer.js -->
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between pt-4">
+            <button onclick="App.goToStep(4)" class="btn-secondary py-3 px-5 text-sm font-semibold rounded-xl">Back to Interview</button>
+            <button onclick="App.goToStep(6)" class="btn-primary py-3.5 px-8 text-base font-semibold rounded-xl">
+              <span>Continue to Summary</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 6: PATIENT-FACING SUMMARY & PDF COPY -->
+      <section id="kiosk-step-6" class="hidden max-w-3xl mx-auto space-y-6">
+        <div id="patient-summary-container">
+          <!-- Populated by app.js loadFinalPatientSummary -->
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- VIEW 2: DOCTOR DASHBOARD & CLINICAL VERIFICATION WORKFLOW    -->
+    <!-- ============================================================ -->
+    <div id="view-doctor-dashboard" class="hidden space-y-6 animate-fadeIn">
+      
+      <!-- Top Metrics Banner -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Today's Patients</div>
+            <div id="stat-total-patients" class="text-2xl font-extrabold text-slate-900 mt-1">5</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
+            <i data-lucide="users" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-amber-600 uppercase tracking-wider">Pending Verification</div>
+            <div id="stat-pending-verify" class="text-2xl font-extrabold text-amber-600 mt-1">3</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            <i data-lucide="clock" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Doctor Verified</div>
+            <div id="stat-verified-today" class="text-2xl font-extrabold text-emerald-600 mt-1">2</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-red-600 uppercase tracking-wider">Abnormal Lab / Rad Alerts</div>
+            <div id="stat-lab-alerts" class="text-2xl font-extrabold text-red-600 mt-1">2</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+            <i data-lucide="alert-circle" class="w-5 h-5"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Queue Header & Filter Controls -->
+      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h3 class="text-xl font-bold text-slate-900">OPD Patient Intake Queue</h3>
+            <p class="text-slate-500 text-xs mt-0.5">Patients prepared by ArogyaMitra prior to clinical consultation.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="DoctorDashboard.setQueueFilter('ALL')" data-filter="ALL" class="queue-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#7CA68D] text-white">All Patients</button>
+            <button onclick="DoctorDashboard.setQueueFilter('PENDING')" data-filter="PENDING" class="queue-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-600">Pending Review</button>
+            <button onclick="DoctorDashboard.setQueueFilter('VERIFIED')" data-filter="VERIFIED" class="queue-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-600">Verified</button>
+          </div>
+        </div>
+
+        <!-- Patients Queue Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider font-semibold">
+              <tr>
+                <th class="px-5 py-3 rounded-l-xl">Token</th>
+                <th class="px-5 py-3">Patient Name & Demographics</th>
+                <th class="px-5 py-3">ABHA Health ID</th>
+                <th class="px-5 py-3">Chief Complaint</th>
+                <th class="px-5 py-3">Summary State</th>
+                <th class="px-5 py-3 text-right rounded-r-xl">Action</th>
+              </tr>
+            </thead>
+            <tbody id="doctor-patient-queue" class="divide-y divide-slate-100">
+              <!-- Populated by doctor.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- VIEW 3: RADIOLOGIST PORTAL & IMAGING DIAGNOSTICS (NEW)      -->
+    <!-- ============================================================ -->
+    <div id="view-radiology-portal" class="hidden space-y-6 animate-fadeIn">
+      
+      <!-- Top Metrics Banner -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Imaging Studies</div>
+            <div id="stat-rad-total" class="text-2xl font-extrabold text-slate-900 mt-1">3</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+            <i data-lucide="scan" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-amber-600 uppercase tracking-wider">Pending Reports</div>
+            <div id="stat-rad-pending" class="text-2xl font-extrabold text-amber-600 mt-1">0</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            <i data-lucide="clock" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Completed Reports</div>
+            <div id="stat-rad-completed" class="text-2xl font-extrabold text-emerald-600 mt-1">3</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+          <div>
+            <div class="text-xs font-bold text-red-600 uppercase tracking-wider">Critical Alert Findings</div>
+            <div id="stat-rad-alerts" class="text-2xl font-extrabold text-red-600 mt-1">1</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
+            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left 2 Cols: Submit Radiology Report Form -->
+        <div class="lg:col-span-2 bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-5">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-bold mb-2">
+              <i data-lucide="scan" class="w-3.5 h-3.5"></i>
+              <span>Radiology Diagnostic Entry</span>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900">Upload Radiology & Imaging Report</h3>
+            <p class="text-slate-500 text-xs">Enter diagnostic radiology findings, impressions, and recommendations linked directly to the patient's medical timeline.</p>
+          </div>
+
+          <!-- Presets -->
+          <div>
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Apply Template / Preset:</div>
+            <div id="rad-preset-chips" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <!-- Populated by radiologist.js -->
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Select Patient *</label>
+              <select id="rad-patient-select" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none bg-white">
+                <!-- Populated by radiologist.js -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Study Date</label>
+              <input type="date" id="rad-input-date" value="2026-08-28" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Modality *</label>
+              <select id="rad-input-modality" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none bg-white">
+                <option value="XRAY">X-Ray (Plain Radiography)</option>
+                <option value="CT">Computed Tomography (CT)</option>
+                <option value="MRI">Magnetic Resonance (MRI)</option>
+                <option value="USG">Ultrasound (USG)</option>
+              </select>
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Study Type / Examination *</label>
+              <input type="text" id="rad-input-study-type" value="Chest X-Ray PA View" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Clinical Indication</label>
+            <input type="text" id="rad-input-indication" placeholder="e.g. Exertional breathlessness and chest tightness" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Detailed Findings * (Encrypted at rest)</label>
+            <textarea id="rad-input-findings" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none font-mono"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Impression & Diagnostic Opinion * (Encrypted at rest)</label>
+            <textarea id="rad-input-impression" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none font-bold text-slate-900"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Recommendations & Advice</label>
+            <input type="text" id="rad-input-recommendation" placeholder="e.g. 2D Echo recommended" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" />
+          </div>
+
+          <div class="flex items-center justify-between pt-2">
+            <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-red-600">
+              <input type="checkbox" id="rad-input-alert" class="w-4 h-4 rounded text-red-600 focus:ring-red-500" />
+              <span>Flag as Critical / Urgent Doctor Alert</span>
+            </label>
+            <button onclick="RadiologistPortal.submitRadiologyReport()" class="btn-primary py-3 px-6 text-sm font-semibold rounded-xl shadow-sm">
+              <i data-lucide="check" class="w-4 h-4"></i>
+              <span>Sign & Link to Patient Record</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right 1 Col: Studies Queue -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="font-bold text-slate-900 text-sm">Radiology Reports Stream</h4>
+            <button onclick="RadiologistPortal.loadQueue()" class="p-1 text-slate-400 hover:text-slate-600 rounded">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div class="overflow-x-auto max-h-[520px]">
+            <table class="w-full text-left">
+              <tbody id="radiology-studies-queue" class="divide-y divide-slate-100">
+                <!-- Populated by radiologist.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- VIEW 4: LAB DIAGNOSTICS PORTAL                              -->
+    <!-- ============================================================ -->
+    <div id="view-lab-portal" class="hidden space-y-6 animate-fadeIn">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left 2 Cols: Add Lab Report Form -->
+        <div class="lg:col-span-2 bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-5">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-2">
+              <i data-lucide="flask-conical" class="w-3.5 h-3.5"></i>
+              <span>Laboratory Diagnostic Entry</span>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900">Add Lab Test Report</h3>
+            <p class="text-slate-500 text-xs">Associate biochemical test parameters with patient timeline and trigger doctor alerts for abnormal values.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Select Patient *</label>
+              <select id="lab-patient-select" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none bg-white">
+                <!-- Populated by lab.js -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Test Date</label>
+              <input type="date" id="lab-test-date" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Test Panel / Investigation Type</label>
+            <input type="text" id="lab-test-type" value="Complete Diabetic & Lipid Profile" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" />
+          </div>
+
+          <!-- Test Parameters Table -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Test Parameters & Reference Limits</span>
+              <button type="button" onclick="LabPortal.addTestRow()" class="text-xs font-semibold text-[#7CA68D] hover:underline flex items-center gap-1">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>Add Row</span>
+              </button>
+            </div>
+
+            <div id="lab-test-rows-container" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+              <!-- Populated by lab.js -->
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Lab Observations / Pathologist Notes</label>
+            <input type="text" id="lab-notes" placeholder="e.g. Lipemic sample, verified on Roche Cobas analyzer..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" />
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 flex justify-end">
+            <button onclick="LabPortal.submitReport()" class="btn-primary py-3 px-6 text-sm font-semibold rounded-xl shadow-sm">
+              <i data-lucide="check" class="w-4 h-4"></i>
+              <span>Save & Link to Patient Record</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right 1 Col: Recent Reports Stream -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+          <h4 class="font-bold text-slate-900 text-sm">Recent Lab Reports</h4>
+          <div id="recent-lab-reports-list" class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+            <!-- Populated by lab.js -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- VIEW 5: ADMIN CONTROLS & STAFF MANAGEMENT PORTAL            -->
+    <!-- ============================================================ -->
+    <div id="view-admin-portal" class="hidden space-y-6 animate-fadeIn">
+      
+      <!-- Staff Account Management Section -->
+      <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-2">
+              <i data-lucide="users" class="w-3.5 h-3.5"></i>
+              <span>Hospital Staff Credentials</span>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900">Staff Account Management</h3>
+            <p class="text-slate-500 text-xs mt-0.5">Generate Doctor, Radiologist, and Admin credentials with temporary passwords and manage account activations.</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button onclick="AdminPortal.openGenerateCredentialsModal('DOCTOR')" class="btn-primary py-2.5 px-4 text-xs font-bold rounded-xl flex items-center gap-1.5">
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              <span>Generate Doctor Credentials</span>
+            </button>
+            <button onclick="AdminPortal.openGenerateCredentialsModal('RADIOLOGIST')" class="px-4 py-2.5 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold flex items-center gap-1.5 transition">
+              <i data-lucide="scan" class="w-4 h-4"></i>
+              <span>Generate Radiologist Credentials</span>
+            </button>
+            <button onclick="AdminPortal.openGenerateCredentialsModal('ADMIN')" class="btn-secondary py-2.5 px-4 text-xs font-bold rounded-xl flex items-center gap-1.5">
+              <i data-lucide="shield" class="w-4 h-4"></i>
+              <span>Generate Admin Credentials</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Staff Accounts Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider font-semibold">
+              <tr>
+                <th class="p-3.5 rounded-l-xl">Login ID</th>
+                <th class="p-3.5">Staff Name & Contact</th>
+                <th class="p-3.5">Assigned Role</th>
+                <th class="p-3.5">Status</th>
+                <th class="p-3.5">Created Date</th>
+                <th class="p-3.5 text-right rounded-r-xl">Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-staff-accounts-table" class="divide-y divide-slate-100">
+              <!-- Populated by admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- System Configuration Controls -->
+      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div>
+            <h3 class="text-xl font-bold text-slate-900">System Operational Controls</h3>
+            <p class="text-slate-500 text-xs">Configure platform modules, ABDM mock connectivity, and AYUSH intake modes.</p>
+          </div>
+          <button onclick="AdminPortal.saveConfig()" class="btn-primary py-2 px-4 text-xs font-semibold rounded-lg">
+            <span>Save Settings</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <label class="p-4 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer bg-slate-50 hover:bg-white transition">
+            <div>
+              <span class="font-bold text-slate-900 text-sm block">AYUSH Pariksha Mode</span>
+              <span class="text-xs text-slate-500">Enable Dashavidha Pariksha in clinical intake</span>
+            </div>
+            <input type="checkbox" id="config-ayush-toggle" checked class="w-5 h-5 text-[#7CA68D] rounded" />
+          </label>
+
+          <label class="p-4 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer bg-slate-50 hover:bg-white transition">
+            <div>
+              <span class="font-bold text-slate-900 text-sm block">Mock ABDM Gateway</span>
+              <span class="text-xs text-slate-500">ABHA verification & FHIR bundle adapter</span>
+            </div>
+            <input type="checkbox" id="config-abdm-toggle" checked class="w-5 h-5 text-[#7CA68D] rounded" />
+          </label>
+
+          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+            <span class="font-bold text-slate-900 text-sm block mb-1">Session Audio Retention</span>
+            <div class="flex items-center gap-2">
+              <input type="number" id="config-retention-input" value="30" class="w-20 px-2 py-1 rounded border border-slate-300 text-xs" />
+              <span class="text-xs text-slate-500">Days (Privacy policy auto-purge)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Security Audit Log Stream -->
+      <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-xl font-bold text-slate-900">Security & Compliance Audit Log</h3>
+            <p class="text-slate-500 text-xs">Immutable audit trace tracking views, edits, verifications, and consent grants.</p>
+          </div>
+          <button onclick="AdminPortal.loadAuditLogs()" class="p-2 text-slate-500 hover:text-slate-800 rounded-lg" title="Refresh logs">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="overflow-x-auto max-h-96">
+          <table class="w-full text-left">
+            <thead class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider font-semibold sticky top-0">
+              <tr>
+                <th class="p-3">Timestamp</th>
+                <th class="p-3">Action</th>
+                <th class="p-3">User / Actor</th>
+                <th class="p-3">Action Details</th>
+                <th class="p-3">IP Address</th>
+              </tr>
+            </thead>
+            <tbody id="admin-audit-logs-table" class="divide-y divide-slate-100">
+              <!-- Populated by admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ============================================================ -->
+  <!-- MODALS SECTION                                               -->
+  <!-- ============================================================ -->
+
+  <!-- MODAL: PATIENT AUTH (REGISTER & LOGIN) -->
+  <div id="patient-auth-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 p-6 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-[#7CA68D]/15 text-[#638d74] flex items-center justify-center">
+            <i data-lucide="user" class="w-4 h-4"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">Patient Access</h3>
+        </div>
+        <button onclick="AuthController.closePatientAuthModal()" class="p-1 text-slate-400 hover:text-slate-600 rounded">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="flex border-b border-slate-200">
+        <button id="pat-tab-btn-login" onclick="AuthController.switchPatientTab('login')" class="flex-1 py-2.5 text-center font-bold text-xs sm:text-sm border-b-2 border-[#7CA68D] text-[#7CA68D]">
+          Existing Patient Login
+        </button>
+        <button id="pat-tab-btn-reg" onclick="AuthController.switchPatientTab('reg')" class="flex-1 py-2.5 text-center font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-500 hover:text-slate-800">
+          New Patient Register
+        </button>
+      </div>
+
+      <!-- Patient Login Form -->
+      <form id="pat-form-login" onsubmit="AuthController.handlePatientLogin(event)" class="space-y-4 pt-2">
+          <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number or ABHA ID *</label>
+          <input type="text" id="pat-login-id" placeholder="+91 98765 43210" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:border-[#7CA68D] outline-none" required />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Password *</label>
+          <div class="relative">
+            <input type="password" id="pat-login-password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:border-[#7CA68D] outline-none" required />
+            <button type="button" onclick="AuthController.togglePassword('pat-login-password', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-700">Show</button>
+          </div>
+        </div>
+        <div class="text-[11px] text-slate-500">
+          For demonstration account details in local development, please contact the system administrator. Demo credentials are not shown here.
+        </div>
+        <button type="submit" class="btn-primary w-full py-3 text-sm font-bold rounded-xl shadow-sm">
+          <span>Login to Patient Portal</span>
+        </button>
+      </form>
+
+      <!-- Patient Register Form -->
+      <form id="pat-form-reg" onsubmit="AuthController.handlePatientRegister(event)" class="hidden space-y-3 pt-2">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name *</label>
+          <input type="text" id="pat-reg-name" placeholder="e.g. Ramesh Chandra" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" required />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number *</label>
+          <input type="text" id="pat-reg-phone" placeholder="e.g. +91 98765 43299" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" required />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Date of Birth</label>
+            <input type="date" id="pat-reg-dob" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Gender</label>
+            <select id="pat-reg-gender" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none bg-white">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ABHA Health ID (Optional)</label>
+          <input type="text" id="pat-reg-abha" placeholder="e.g. 91-4820-9182-3841@abdm" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none font-mono" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Preferred Language</label>
+          <select id="pat-reg-lang" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none bg-white">
+            <option value="hi">Hindi (हिन्दी)</option>
+            <option value="en">English</option>
+            <option value="bn">Bengali (বাংলা)</option>
+            <option value="te">Telugu (తెలుగు)</option>
+            <option value="ta">Tamil (தமிழ்)</option>
+            <option value="mr">Marathi (मराठी)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Create Password *</label>
+          <div class="relative">
+            <input type="password" id="pat-reg-password" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" required />
+            <button type="button" onclick="AuthController.togglePassword('pat-reg-password', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-700">Show</button>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary w-full py-3 text-sm font-bold rounded-xl shadow-sm">
+          <span>Create Account & Start Intake</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: STAFF LOGIN (DOCTOR, RADIOLOGIST, ADMIN) -->
+  <div id="staff-login-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 p-6 space-y-5 animate-fadeIn">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div>
+          <span id="staff-login-role-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">DOCTOR</span>
+          <h3 id="staff-login-title" class="text-xl font-bold text-slate-900 mt-1">Staff Portal Login</h3>
+        </div>
+        <button onclick="AuthController.closeStaffLoginModal()" class="p-1 text-slate-400 hover:text-slate-600 rounded">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900">
+        <i data-lucide="lock" class="w-4 h-4 inline-block mr-1"></i> <b>Authorized Personnel Only:</b> Staff accounts are provisioned exclusively by Hospital Administrators. Public registration is prohibited for staff roles.
+      </div>
+
+      <form onsubmit="AuthController.handleStaffLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Staff Login ID *</label>
+          <input type="text" id="staff-login-id" placeholder="e.g. DOC-1001" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-mono focus:border-[#7CA68D] outline-none" required />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Password *</label>
+          <div class="relative">
+            <input type="password" id="staff-login-password" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:border-[#7CA68D] outline-none" required />
+            <button type="button" onclick="AuthController.togglePassword('staff-login-password', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-700">Show</button>
+          </div>
+        </div>
+
+        <div id="staff-demo-credentials-box" class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1.5 text-slate-600">
+          <div class="font-bold text-slate-700 uppercase tracking-wider text-[10px]">Access Notes</div>
+          <div class="text-[12px] text-slate-700">Staff accounts are managed by Hospital Administrators. Contact your administrator to obtain credentials for the production/demo environment.</div>
+        </div>
+
+        <button type="submit" class="btn-primary w-full py-3 text-sm font-bold rounded-xl shadow-sm">
+          <span>Authenticate & Open Portal</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: FORCED FIRST-LOGIN PASSWORD CHANGE -->
+  <div id="force-password-modal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-amber-300 p-6 space-y-4 animate-fadeIn">
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto">
+          <i data-lucide="key" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900">First-Time Login Security</h3>
+        <p class="text-xs text-slate-500">
+          Account: <span id="force-pwd-user-label" class="font-bold text-slate-800"></span>
+        </p>
+        <p class="text-xs text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+          For security compliance, you must change your temporary password before accessing the platform dashboard.
+        </p>
+      </div>
+
+      <form onsubmit="AuthController.handleForcePasswordChange(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Current Temporary Password *</label>
+          <input type="password" id="force-pwd-old" placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" required />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">New Secure Password *</label>
+          <input type="password" id="force-pwd-new" placeholder="At least 6 characters" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" required />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Confirm New Password *</label>
+          <input type="password" id="force-pwd-confirm" placeholder="Repeat new password" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" required />
+        </div>
+        <button type="submit" class="btn-primary w-full py-3 text-sm font-bold rounded-xl shadow-sm">
+          <span>Set Password & Activate Account</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN GENERATE STAFF CREDENTIALS -->
+  <div id="generate-credentials-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 p-6 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <h3 class="text-lg font-bold text-slate-900">Provision Staff Credentials</h3>
+        <button onclick="AdminPortal.closeGenerateCredentialsModal()" class="p-1 text-slate-400 hover:text-slate-600 rounded">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Generation Form -->
+      <form id="gen-credentials-form" onsubmit="AdminPortal.handleGenerateCredentials(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Role *</label>
+          <select id="gen-staff-role" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none bg-white">
+            <option value="DOCTOR">Doctor (Physician OPD)</option>
+            <option value="RADIOLOGIST">Radiologist (Diagnostic Imaging)</option>
+            <option value="ADMIN">System Administrator</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name *</label>
+          <input type="text" id="gen-staff-name" placeholder="e.g. Dr. Meera Deshmukh" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" required />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Official Email</label>
+          <input type="email" id="gen-staff-email" placeholder="meera.d@cityhospital.in" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Department</label>
+            <input type="text" id="gen-staff-dept" placeholder="Cardiology OPD" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Specialization</label>
+            <input type="text" id="gen-staff-spec" placeholder="Cardiologist" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs focus:border-[#7CA68D] outline-none" />
+          </div>
+        </div>
+        <button type="submit" class="btn-primary w-full py-3 text-sm font-bold rounded-xl shadow-sm">
+          <span>Generate Credentials</span>
+        </button>
+      </form>
+
+      <!-- Generated Result Display -->
+      <div id="gen-credentials-result" class="hidden space-y-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+        <div class="flex items-center gap-2 text-emerald-800 font-bold text-sm">
+          <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600"></i>
+          <span>Staff Account Created!</span>
+        </div>
+        <div class="space-y-1.5 text-xs font-mono bg-white p-3 rounded-lg border border-emerald-100">
+          <div><b>Staff Name:</b> <span id="gen-result-name" class="font-bold font-sans"></span></div>
+          <div><b>Role:</b> <span id="gen-result-role"></span></div>
+          <div><b>Login ID:</b> <span id="gen-result-login-id" class="font-bold text-slate-900"></span></div>
+          <div><b>Temporary Password:</b> <span id="gen-result-temp-pwd" class="font-bold text-red-600"></span></div>
+        </div>
+        <button onclick="AdminPortal.copyCredentials()" class="btn-secondary w-full py-2.5 text-xs font-bold rounded-xl flex items-center justify-center gap-2">
+          <i data-lucide="copy" class="w-4 h-4"></i>
+          <span>Copy Credentials</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RADIOLOGY STUDY DETAILS VIEW -->
+  <div id="radiology-view-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 p-6 space-y-4 animate-fadeIn">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div class="flex items-center gap-2 font-bold text-slate-900">
+          <i data-lucide="scan" class="w-5 h-5 text-purple-600"></i>
+          <span>Radiology Diagnostic Report</span>
+        </div>
+        <button onclick="RadiologistPortal.closeStudyViewModal()" class="p-1 text-slate-400 hover:text-slate-600 rounded">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div id="radiology-view-content" class="overflow-y-auto max-h-[70vh]"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: DOCTOR PATIENT DOSSIER VIEW -->
+  <div id="doctor-dossier-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div class="bg-white w-full max-w-5xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] animate-fadeIn">
+      
+      <!-- Dossier Header -->
+      <div id="dossier-header-info" class="p-5 sm:p-6 bg-slate-50 border-b border-slate-200">
+        <!-- Populated by doctor.js -->
+      </div>
+
+      <!-- Dossier Navigation Tabs -->
+      <div class="flex items-center px-6 bg-white border-b border-slate-200 text-xs sm:text-sm font-semibold overflow-x-auto">
+        <button id="dossier-btn-summary" onclick="DoctorDashboard.switchDossierTab('summary')" class="py-3 px-4 border-b-2 border-[#7CA68D] text-[#7CA68D] whitespace-nowrap">
+          AI Summary & Verification
+        </button>
+        <button id="dossier-btn-history" onclick="DoctorDashboard.switchDossierTab('history')" class="py-3 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">
+          Structured History & Transcript
+        </button>
+        <button id="dossier-btn-timeline" onclick="DoctorDashboard.switchDossierTab('timeline')" class="py-3 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">
+          Medical Timeline
+        </button>
+        <button id="dossier-btn-docs" onclick="DoctorDashboard.switchDossierTab('docs')" class="py-3 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">
+          Scanned OCR Documents
+        </button>
+        <button id="dossier-btn-labs" onclick="DoctorDashboard.switchDossierTab('labs')" class="py-3 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">
+          Lab Reports & Alerts
+        </button>
+        <button id="dossier-btn-radiology" onclick="DoctorDashboard.switchDossierTab('radiology')" class="py-3 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap">
+          Radiology & Imaging Reports
+        </button>
+      </div>
+
+      <!-- Dossier Tab Contents -->
+      <div class="p-6 overflow-y-auto flex-1 bg-white">
+        <div id="dossier-tab-summary"></div>
+        <div id="dossier-tab-history" class="hidden"></div>
+        <div id="dossier-tab-timeline" class="hidden"></div>
+        <div id="dossier-tab-docs" class="hidden"></div>
+        <div id="dossier-tab-labs" class="hidden"></div>
+        <div id="dossier-tab-radiology" class="hidden"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: DOCUMENT OCR & CLINICAL ENTITY INSPECTOR -->
+  <div id="ocr-inspector-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh] animate-fadeIn">
+      
+      <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-2 font-bold text-slate-900 text-sm">
+          <i data-lucide="scan" class="w-4 h-4 text-[#7CA68D]"></i>
+          <span>Document AI & Multilingual OCR Inspector</span>
+        </div>
+        <button onclick="OCRViewer.closeInspector()" class="p-1 text-slate-400 hover:text-slate-600 rounded">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div id="ocr-scanning-overlay" class="hidden relative p-8 text-center bg-slate-50">
+        <div class="scanning-line"></div>
+        <div class="w-12 h-12 border-4 border-[#7CA68D] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+        <h4 class="font-bold text-slate-800 text-sm">Reading your document...</h4>
+        <p class="text-xs text-slate-500 mt-1">Extracting medicines, dosages, investigations, and clinical entities.</p>
+      </div>
+
+      <div id="ocr-inspector-content" class="p-6 overflow-y-auto flex-1"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: PRIORITY ALERT FEATURE MODAL -->
+  <div id="red-flag-feature-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 p-6 space-y-4 animate-fadeIn text-center">
+      <div class="w-14 h-14 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto">
+        <i data-lucide="alert-triangle" class="w-7 h-7"></i>
+      </div>
+      <h3 class="text-xl font-bold text-slate-900">Automated Priority Alert Detection</h3>
+      <div class="inline-block px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold uppercase tracking-wider">
+        Coming Soon
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed text-left p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+        A future version of ArogyaMitra will assist clinical staff by identifying potential priority symptoms for review before OPD entry.
+        <br/><br/>
+        <b>Safety & Compliance Notice:</b> Automated priority screening will serve as an assistive triage aid; it does not replace immediate emergency care or autonomous clinical diagnosis.
+      </p>
+      <button onclick="DoctorDashboard.closeRedFlagModal()" class="btn-primary w-full py-2.5 text-sm font-semibold rounded-xl">
+        <span>Understood</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+  <!-- SCRIPTS -->
+  <script src="/static/js/voice.js"></script>
+  <script src="/static/js/intake.js"></script>
+  <script src="/static/js/ocr_viewer.js"></script>
+  <script src="/static/js/doctor.js"></script>
+  <script src="/static/js/radiologist.js"></script>
+  <script src="/static/js/lab.js"></script>
+  <script src="/static/js/admin.js"></script>
+  <script src="/static/js/auth.js"></script>
+  <script src="/static/js/app.js"></script>
+
+</body>
+</html>

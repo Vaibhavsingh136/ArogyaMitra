@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.env
+.env.*
+
+# Virtualenv
+venv/
+.venv/
+ENV/
+env/
+
+# Data and uploads
+data/
+app/static/sample_docs/
+
+# VSCode
+.vscode/
+
+# Pytest
+.cache/
+
+# Byte-compiled / distribution
+build/
+dist/
+
+# OS
+.DS_Store
+Thumbs.db
